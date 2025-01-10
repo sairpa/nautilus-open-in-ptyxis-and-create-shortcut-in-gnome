@@ -83,18 +83,22 @@ class PtyxisNautilus(GObject.GObject, Nautilus.MenuProvider):
         return item
 
     def is_native(self):
-        if shutil.which("ptyxis-terminal") == "/usr/bin/ptyxis-terminal":
+        which = shutil.which("ptyxis-terminal") 
+        if which == "/usr/bin/ptyxis-terminal" or which == "/usr/local/bin/ptyxis-terminal":
             return "ptyxis-terminal"
-        if shutil.which("ptyxis") == "/usr/bin/ptyxis":
+        which = shutil.which("ptyxis") 
+        if which == "/usr/bin/ptyxis" or which == "/usr/local/bin/ptyxis":
             return "ptyxis"
 
     def _nautilus_run(self, menu, path):
         """'Open with Ptyxis's menu item callback."""
-        logging.debug("Openning:", path)
+        native = self.is_native()
+        logging.debug("Calling command:", native)
+        logging.debug("Opening path:", path)
         args = None
-        if self.is_native()=="ptyxis-terminal":
+        if native == "ptyxis-terminal":
             args = ["ptyxis-terminal", "--new-window", "-d", path]
-        elif self.is_native()=="ptyxis":
+        elif native =="ptyxis":
             args = ["ptyxis", "--new-window", "-d", path]
         else:
             args = ["/usr/bin/flatpak", "run", TERMINAL_NAME, "--new-window", "-d", path]
